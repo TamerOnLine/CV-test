@@ -1,0 +1,18 @@
+{
+  "theme_name": "aqua-card",
+  "palette": {
+    "primary": "#06B6D4",
+    "muted": "#64748B",
+    "panel_bg": "#F7F8FA"
+  },
+  "fonts": {
+    "base": "NotoNaskhArabic",
+    "size_pt": 10.5
+  },
+  "overrides": {
+    "header_name": { "data": { "highlight_bg": "#E0F2FE" } }
+  },
+  "map_rules": {
+    "links_inline": "contact"
+  }
+}

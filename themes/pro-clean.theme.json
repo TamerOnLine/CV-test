@@ -1,0 +1,49 @@
+{
+  "theme_name": "pro-clean",
+  "palette": {
+    "primary": "#0EA5E9",
+    "text": "#1F2937",
+    "muted": "#6B7280",
+    "panel_bg": "#F8FAFC",
+    "divider": "#E5E7EB",
+    "highlight": "#E0F2FE"
+  },
+  "fonts": {
+    "base": "NotoNaskhArabic",
+    "size_pt": 10.5,
+    "h1_pt": 18,
+    "h2_pt": 12.5
+  },
+  "overrides": {
+    "header_name": {
+      "data": { "centered": false, "highlight_bg": "#E0F2FE", "box_h_mm": 26 }
+    },
+    "left_panel_bg": {
+      "data": { "pad_mm": 5, "bg": "#F8FAFC" }
+    },
+    "contact_info": {
+      "data": { "icon_bullets": false, "compact": true }
+    },
+    "projects": {
+      "data": { "title_bold": true, "url_muted": true, "gap_mm": 2.5 }
+    },
+    "education": {
+      "data": { "title_bold": true, "gap_mm": 2 }
+    },
+    "key_skills": {
+      "data": { "chip": true, "chip_pad_mm": 1.6, "wrap": true, "gap_mm": 2 }
+    },
+    "languages": {
+      "data": { "compact": true, "gap_mm": 1.5 }
+    }
+  },
+  "map_rules": {
+    "text_section": { "from": "summary", "fn": "text" },
+    "key_skills":   { "from": "skills",  "fn": "list" },
+    "languages":    { "from": "languages", "fn": "list" },
+    "projects":     { "from": "projects", "fn": "projects" },
+    "education":    { "from": "education", "fn": "list" },
+    "links_inline": "contact",
+    "social_links": "contact"
+  }
+}
