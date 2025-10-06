@@ -1,105 +1,116 @@
-from typing import List
+# api/pdf_utils/text.py
+"""
+Shim layer to keep old blocks working.
+Provides wrap_text / draw_paragraph / draw_par aliases + helpers.
+Handles RTL via api.pdf_utils.rtl.rtl when requested.
+"""
+
+from typing import List, Any
 from reportlab.pdfgen import canvas
-from reportlab.pdfbase import pdfmetrics
+from reportlab.lib.colors import HexColor
+from api.pdf_utils.rtl import rtl as _rtl_unified  # unified RTL
 
-from .fonts import rtl
-from .config import LEADING_BODY, LEADING_BODY_RTL, GAP_BETWEEN_PARAS
-
-def wrap_text(text: str, font: str, size: int, max_w: float) -> List[str]:
-    """
-    Wrap a block of text into multiple lines based on a maximum width.
-
-    Args:
-        text (str): Input text string.
-        font (str): Font name.
-        size (int): Font size.
-        max_w (float): Maximum line width in points.
-
-    Returns:
-        List[str]: List of text lines.
-    """
-    words = text.split()
-    if not words:
-        return [""]
-    lines, cur = [], words[0]
-    for w in words[1:]:
-        trial = f"{cur} {w}"
-        if pdfmetrics.stringWidth(trial, font, size) <= max_w:
-            cur = trial
+# ---------- core word-wrap ----------
+def wrap_text(
+    c: canvas.Canvas,
+    text: str,
+    max_w: float,
+    font: str = "Helvetica",
+    size: int = 10,
+) -> List[str]:
+    c.setFont(font, size)
+    words = str(text or "").split()
+    lines: List[str] = []
+    cur = ""
+    for w in words:
+        test = (cur + " " + w).strip()
+        if c.stringWidth(test, font, size) <= max_w:
+            cur = test
         else:
-            lines.append(cur)
+            if cur:
+                lines.append(cur)
             cur = w
-    lines.append(cur)
-    return lines
+    if cur:
+        lines.append(cur)
+    return lines or [""]
 
-def wrap_lines(lines: List[str], font: str, size: int, max_w: float, do_rtl=False) -> List[str]:
-    """
-    Wrap multiple lines of text with optional RTL reshaping.
-
-    Args:
-        lines (List[str]): List of input lines.
-        font (str): Font name.
-        size (int): Font size.
-        max_w (float): Maximum width for each line.
-        do_rtl (bool): Whether to apply RTL shaping.
-
-    Returns:
-        List[str]: Wrapped and optionally reshaped lines.
-    """
-    out: List[str] = []
+# ---------- paragraph drawing ----------
+def draw_paragraph(
+    c: canvas.Canvas,
+    x: float,
+    y: float,
+    w: float,
+    text: str,
+    leading: float,
+    font: str = "Helvetica",
+    size: int = 10,
+    is_rtl: bool = False,
+) -> float:
+    if not text:
+        return y
+    raw = str(text)
+    if is_rtl:
+        raw = _rtl_unified(raw)
+    lines = wrap_text(c, raw, w, font, size)
     for ln in lines:
-        t = rtl(ln) if do_rtl else ln
-        out.extend(wrap_text(t, font, size, max_w))
-    return out
+        if is_rtl:
+            c.drawRightString(x + w, y, ln)
+        else:
+            c.drawString(x, y, ln)
+        y -= leading
+    return y
 
+# ---------- aliases expected by legacy blocks ----------
 def draw_par(
     c: canvas.Canvas,
     x: float,
     y: float,
-    lines: List[str],
-    font: str,
-    size: int,
-    max_w: float,
-    align: str = "left",
-    rtl_mode: bool = False,
-    leading: int | None = None,
-    para_gap: int | None = None,
+    w: float,
+    text: str,
+    leading: float,
+    font: str = "Helvetica",
+    size: int = 10,
+    is_rtl: bool = False,
 ) -> float:
-    """
-    Render paragraphs with wrapping, alignment, and spacing.
+    """Alias for draw_paragraph (legacy blocks import draw_par)."""
+    return draw_paragraph(c, x, y, w, text, leading, font, size, is_rtl)
 
-    Args:
-        c (canvas.Canvas): The PDF canvas.
-        x (float): Starting X-coordinate.
-        y (float): Starting Y-coordinate.
-        lines (List[str]): Lines of text to render.
-        font (str): Font name.
-        size (int): Font size.
-        max_w (float): Maximum paragraph width.
-        align (str): Text alignment ("left" or "right").
-        rtl_mode (bool): Whether to apply RTL text shaping.
-        leading (int | None): Line height override.
-        para_gap (int | None): Vertical gap between paragraphs.
+# some blocks might import pct_to_w; provide both names
+def pct_to_width(val: Any, full_w: float) -> float:
+    s = str(val or "").strip()
+    if s.endswith("%"):
+        try:
+            return full_w * (float(s[:-1]) / 100.0)
+        except Exception:
+            return full_w
+    try:
+        return float(s)
+    except Exception:
+        return full_w
 
-    Returns:
-        float: New Y-coordinate after rendering.
-    """
-    c.setFont(font, size)
-    cur = y
-    line_gap = leading if leading is not None else (
-        LEADING_BODY_RTL if (rtl_mode and align == "right") else LEADING_BODY
-    )
-    gap_between_paras = GAP_BETWEEN_PARAS if para_gap is None else para_gap
+def pct_to_w(val: Any, full_w: float) -> float:
+    """Alias for pct_to_width."""
+    return pct_to_width(val, full_w)
 
-    for raw in lines:
-        txt = rtl(raw) if (rtl_mode and align == "right") else raw
-        wrapped = wrap_text(txt, font, size, max_w) if txt else [""]
-        for ln in wrapped:
-            if align == "right":
-                c.drawRightString(x + max_w, cur, ln)
-            else:
-                c.drawString(x, cur, ln)
-            cur -= line_gap
-        cur -= gap_between_paras
+def deep_update(target: dict, source: dict) -> dict:
+    if not isinstance(target, dict) or not isinstance(source, dict):
+        return target
+    for k, v in source.items():
+        if isinstance(v, dict) and isinstance(target.get(k), dict):
+            deep_update(target[k], v)
+        else:
+            target[k] = v
+    return target
 
-    return cur
+def hex_color(s: str):
+    return HexColor(s)
+
+__all__ = [
+    "wrap_text",
+    "draw_paragraph",
+    "draw_par",       # alias
+    "pct_to_width",
+    "pct_to_w",      # alias
+    "deep_update",
+    "hex_color",
+]

@@ -69,7 +69,7 @@ def render_generate_actions(outputs_dir):
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        if st.button("🚀 Generate PDF", type="primary", use_container_width=True):
+        if st.button("🚀 Generate PDF", type="primary", width='stretch'):
             try:
                 pdf_bytes = generate_pdf(
                     profile,
@@ -84,7 +84,7 @@ def render_generate_actions(outputs_dir):
                     data=pdf_bytes,
                     file_name=f"resume-{theme_name}.pdf",
                     mime="application/pdf",
-                    use_container_width=True,
+                    width='stretch',
                 )
             except Exception as e:
                 st.error(f"❌ Failed to generate PDF: {e}")

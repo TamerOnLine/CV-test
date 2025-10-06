@@ -1,17 +1,17 @@
 {
-  "theme_name": "pro-clean",
+  "theme_name": "modern-dark",
   "ui_lang": "en",
   "rtl_mode": false,
   "colors": {
-    "primary": "#0F172A",
-    "text": "#111827",
-    "accent": "#2563EB",
-    "bg": "#FFFFFF"
+    "primary": "#93C5FD",
+    "text": "#E5E7EB",
+    "accent": "#60A5FA",
+    "bg": "#0B1020"
   },
   "fonts": {
-    "base": "NotoNaskhArabic",
-    "bold": "NotoNaskhArabic-Bold",
-    "heading": "NotoNaskhArabic-Bold"
+    "base": "DejaVuSans",
+    "bold": "DejaVuSans-Bold",
+    "heading": "DejaVuSans-Bold"
   },
   "sizes": {
     "h1": 20,
@@ -19,8 +19,8 @@
     "h3": 11,
     "body": 10,
     "lead_h1": 24,
-    "lead_h2": 18,
-    "lead_h3": 15,
+    "lead_h2": 19,
+    "lead_h3": 16,
     "lead_body": 14
   },
   "sp_after_header": 8,
@@ -30,20 +30,14 @@
     "header_name": {
       "data": {
         "centered": false,
-        "highlight_bg": "#EEF2FF",
+        "highlight_bg": "#11183A",
         "box_h_mm": 26
       }
     },
     "left_panel_bg": {
       "data": {
         "pad_mm": 6,
-        "bg": "#F8FAFC"
-      }
-    },
-    "projects": {
-      "data": {
-        "title_bold": true,
-        "gap_mm": 2.5
+        "bg": "#0F172A"
       }
     }
   }

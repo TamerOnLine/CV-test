@@ -34,3 +34,4 @@ charset-normalizer==3.4.3
 # 🧪 Development & Testing
 # ============================================================
 coverage==7.10.7
+
